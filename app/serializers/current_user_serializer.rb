@@ -65,7 +65,8 @@ class CurrentUserSerializer < BasicUserSerializer
              :can_review,
 
   def groups
-    object.visible_groups.pluck(:id, :name).map { |id, name| { id: id, name: name } }
+    owned_group_ids = GroupUser.where(user_id: id, owner: true).pluck(:group_id).to_set
+    object.visible_groups.pluck(:id, :name).map { |id, name| { id: id, name: name, owner: owned_group_ids.include?(id) } }
   end
 
   def link_posting_access
